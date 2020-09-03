@@ -1,7 +1,7 @@
 robotframework
 docutils
 
-flex
+openapi-core
 GenSON
 jsonpath-ng
 pygments

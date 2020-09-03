@@ -26,14 +26,15 @@ from tzlocal import get_localzone
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
-from json import dumps, loads
+from json import dumps
 from os import path, getcwd
 
-from flex.core import validate_api_call
 from genson import SchemaBuilder
 from jsonpath_ng.ext import parse as parse_jsonpath
 from jsonschema import validate, FormatChecker
 from jsonschema.exceptions import SchemaError, ValidationError
+from openapi_core.validation.request.validators import RequestValidator
+from openapi_core.validation.response.validators import ResponseValidator
 from requests import request as client
 from requests.exceptions import SSLError, Timeout
 
@@ -1369,9 +1370,18 @@ class Keywords(object):
 
     def _assert_spec(self, spec, response):
         request = response.request
+
+        raise Exception('booooooooooooooooooooooo')
         try:
-            validate_api_call(spec, raw_request=request, raw_response=response)
-        except ValueError as e:
+            validator = RequestValidator(spec)
+            result = validator.validate(request)
+            result.raise_for_errors()
+
+            validator = ResponseValidator(spec)
+            result = validator.validate(request)
+            result.raise_for_errors()
+
+        except Exception as e:
             raise AssertionError(e)
 
     def _validate_schema(self, schema, json_dict):
